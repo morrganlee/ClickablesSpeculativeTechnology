@@ -25,11 +25,11 @@ const morningIndex = 3;
 const nightIndex = 4;
 
 // constants for the pillow
-const pillowSize = 100;
+const pillowSize = 50;
 
 // locations for pillow + images
-const xPos = 800;
-const yPos = 300;
+const xPos = 535;
+const yPos = 70;
 
 // variables for the ballon
 var ellipseDiameter = pillowSize;
@@ -60,8 +60,8 @@ function preload(){
 function setup() {
   createCanvas(1200,800);  
 
-  imageMode(CENTER);
-  rectMode(CENTER);
+  imageMode(CORNER);
+  rectMode(CORNER);
 
   // load the pop sound
   // soundFormats('mp3');
@@ -74,14 +74,14 @@ function setup() {
   // that are not in the array 
   setupClickables(); 
 
-  // start with a red balloon
+  // start with just the pillow
   newPillow(bedIndex);
 
   // output to the message window
   console.log(clickables);
 
   // center images
-  imageMode(CENTER);
+  // imageMode(CENTER);
 }
 
 // Just draw the button
@@ -111,6 +111,7 @@ function drawText() {
 
 function drawPillow() {
   push();
+  imageMode(CORNER);
   image(pillowImg, xPos, yPos);
   pop();
 }
@@ -146,11 +147,11 @@ clickableButtonHover = function () {
 
 clickableButtonOnOutside = function () {
   // Change colors based on the id #
-  if( this.id === morningIndex) {
+  if( this.id === morningIndex || this.id === nightIndex) {
     this.color = "#F1C15D"; // yellow
   }
   else {
-    this.color = "#aabac5"; // blue
+    this.color = "#00000000"; // blue
   }
 
   this.noTint = true;
