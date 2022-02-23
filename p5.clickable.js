@@ -72,6 +72,7 @@ function Clickable() {
 	this.textSize = 12;		//Size for the text shown
 	this.textFont = "sans-serif";	//Font for the text shown
 	this.textScaled = false;     //Scale the text with the size of the clickable
+	this.drawImageOnly = false;		// set to true if we want just the PNG
 	
 	// image options
 	this.image = null; // image object from p5loadimage()
@@ -160,19 +161,26 @@ function Clickable() {
 		}
 
 		push();
-		fill(this.color);
-		stroke(this.stroke);
-		strokeWeight(this.strokeWeight);
-		rect(this.x, this.y, this.width, this.height, this.cornerRadius);
-		fill(this.textColor);
-		noStroke();
+
+		if( !this.drawImageOnly ) {
+			fill(this.color);
+			stroke(this.stroke);
+			strokeWeight(this.strokeWeight);
+			rect(this.x, this.y, this.width, this.height, this.cornerRadius);
+			fill(this.textColor);
+			noStroke();
+		}
+
 		if(this.image){
 			this.drawImage();
 		}
-		textAlign(CENTER, CENTER);
-		textSize(this.textSize);
-		textFont(this.textFont);
-		text(this.text, this.x + this.width / 2, this.y + this.height / 2);
+
+		if( !this.drawImageOnly ) {
+			textAlign(CENTER, CENTER);
+			textSize(this.textSize);
+			textFont(this.textFont);
+			text(this.text, this.x + this.width / 2, this.y + this.height / 2);
+		}
 		if (mouseX >= this.x && mouseY >= this.y
 			&& mouseX < this.x + this.width && mouseY < this.y + this.height) {
 			cl_lastHovered = this;

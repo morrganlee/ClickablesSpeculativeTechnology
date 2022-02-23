@@ -1,12 +1,10 @@
 
 /***********************************************************************************
-  ClickableAllocator
-  by Scott Kildall
-  
-  Start your localhost before running this, otherwise no PNGs will display
+  Clickables with Speculative Technology
+  by Morgan Lee
 
-  Shows an example of how to use allocation tables with the
-  modified p5.clickable class. This uses a ClickableManager class to
+  Experiments with p5.clickable class and ClickableManager for
+  future speculative technology in the form of:
   (1) allocate and set variables from a .csv file
   (2) draw all the clickables that are visible in a single function
 
@@ -20,24 +18,28 @@ var clickablesManager;
 var clickables;
 
 // indexes into the array (constants)
-const redIndex = 0;
-const greenIndex = 1;
-const yellowIndex = 2;
-const inflateIndex = 3;
-const deflateIndex = 4;
+const bedIndex = 0;
+const dreamsIndex = 1;
+const viewerIndex = 2;
+const morningIndex = 3;
+const nightIndex = 4;
 
-// constants for the balloon
-const startEllipseDiameter = 30;
-const poppedEllipseDiameter = 0;
-const deflateAmount = 10;
-const inflateAmount = 5;
-const maxDiameter = 200;
-const minDeflateDiameter = 5;
+// constants for the pillow
+const pillowSize = 100;
+
+// locations for pillow + images
+const xPos = 800;
+const yPos = 300;
 
 // variables for the ballon
-var ellipseDiameter = startEllipseDiameter;
+var ellipseDiameter = pillowSize;
 
-// pop soun
+// image variables
+var pillowImg;
+var images = [];
+var currentImageIndex = 0;
+
+// pop sound
 var popSound;
 
 // ALWAYS allocate the ClickableManager in the preload() function
@@ -45,16 +47,25 @@ var popSound;
 // correct filename or path
 function preload(){
   clickablesManager = new ClickableManager('assets/clickableLayout.csv');
+
+  // load images
+  pillowImg = loadImage('assets/pillow.png');
+  bedImg = loadImage('assets/bed.png');
+  dreamsImg = loadImage('assets/dreams.png');
+  viewerImg = loadImage('assets/viewer.png');
 }
 
 // ALWAYS call the setup() funciton for ClickableManager in the setup(), after
 // the class has been allocated in the preload() function.
 function setup() {
-  createCanvas(1280,600);
+  createCanvas(1200,800);  
+
+  imageMode(CENTER);
+  rectMode(CENTER);
 
   // load the pop sound
-  soundFormats('mp3');
-  popSound = loadSound('assets/pop.mp3');
+  // soundFormats('mp3');
+  // popSound = loadSound('assets/pop.mp3');
 
   // setup the clickables = this will allocate the array
   clickables = clickablesManager.setup();
@@ -64,83 +75,82 @@ function setup() {
   setupClickables(); 
 
   // start with a red balloon
-  newBalloon(redIndex);
+  newPillow(bedIndex);
 
   // output to the message window
   console.log(clickables);
+
+  // center images
+  imageMode(CENTER);
 }
 
 // Just draw the button
 function draw() {
-  background(128);
+  background("#516984");
 
-  // draw "balloon"
-  drawBalloon();
+  drawText();
 
   // draw the p5.clickables
   clickablesManager.draw();
+
+  // draw pillow
+  drawPillow();
 }
 
-function drawBalloon() {
+function drawText() {
+  fill('#e8e8e8');
+  textSize(30);
+  textFont('Forma DJR Deck');
+  text('The Dream-Recording Pillow', 80, 200);
+  
+  //description
+  textSize(15);
+  text('The dream-recording pillow will allow everyone to better understand themselves and make the most of the time they spend while asleep.', 80, 250, 400);
+  // text('The average person spends almost one third of their lifetime asleep, yet less sleep leads to a shorter lifespan. In order to find balance between taking care of the body and maximizing time to be productive, the dream-recording pillow will encourage sleep while saving time spent awake on uncovering emotions and desires. Sleeping allows for humans to process the events of the previous day while also creating very vivid imagery. The dream-recording pillow creates opportunities to better understand anxieties and fears, identify subconscious desires, and to dream bigger and better.', 80, 325, 400);
+}
+
+function drawPillow() {
   push();
-  ellipseMode(CENTER);
-  noStroke();
-  fill(balloonColor);
-  circle(250,height/2, ellipseDiameter);
+  image(pillowImg, xPos, yPos);
   pop();
 }
 
-// change individual fields of the clickables
 function setupClickables() {
-  // set the pop, inflate and deflate to be false, we will change this after
-  // first balloon gets pressed
-  clickables[inflateIndex].visible = false;
-  clickables[deflateIndex].visible = false; 
 
   // These are the CALLBACK functions. Right now, we do the SAME function for all of the clickables
   for( let i = 0; i < clickables.length; i++ ) {
     clickables[i].onPress = clickableButtonPressed;
     clickables[i].onHover = clickableButtonHover;
     clickables[i].onOutside = clickableButtonOnOutside;
+
+    clickables[i].drawImageOnly = false;
+
   }
 }
 
 //--- CLICKABLE CALLBACK FUNCTIONS ----
 
 clickableButtonPressed = function () {
-// NEW BALLOON
-  if( this.id === redIndex || this.id === greenIndex || this.id === yellowIndex ) {
-    newBalloon(this.id);
-  }
-
-// INFLATE OR DEFLATE
-  else if( this.id === deflateIndex ) {
-    ellipseDiameter -= deflateAmount;
-    ellipseDiameter = max(minDeflateDiameter,ellipseDiameter);   // prevents < 0
-  }
-  else if( this.id === inflateIndex ) {
-    ellipseDiameter += inflateAmount;
-    if( ellipseDiameter > maxDiameter ) {
-      popBalloon();
-    }
+// NEW PILLOW
+  if( this.id === bedIndex || this.id === dreamsIndex || this.id === viewerIndex || this.id === morningIndex || this.id === nightIndex) {
+    newPillow(this.id);
   }
 }
 
-// tint when mouse is over
+// tint when mouse hover
 clickableButtonHover = function () {
-  this.color = "#AA33AA";
+  this.color = "#516984"; // dark blue
   this.noTint = false;
-  this.tint = "#FF0000";
+  this.tint = "#aabac5"; // blue
 }
 
-// color a light gray if off
 clickableButtonOnOutside = function () {
   // Change colors based on the id #
-  if( this.id === inflateIndex || this.id === deflateIndex ) {
-    this.color = "#FFFFFF";
+  if( this.id === morningIndex) {
+    this.color = "#F1C15D"; // yellow
   }
   else {
-    this.color = "#AAAAAA";
+    this.color = "#aabac5"; // blue
   }
 
   this.noTint = true;
@@ -148,33 +158,28 @@ clickableButtonOnOutside = function () {
 
 //--- BALLOON FUNCTIONS --
 
-// when a new balloon is made, we show pop and inflate and deflate button,
-// change fill color and reset ellipse diamter
-function newBalloon(idNum) {
-  clickables[inflateIndex].visible = true;
-  clickables[deflateIndex].visible = true; 
-  ellipseDiameter = startEllipseDiameter;
+function newPillow(idNum) {
 
-  if( idNum === redIndex) {
-    balloonColor = color('#FF0000');
+  if( idNum === bedIndex) {
+    image(bedImg, xPos, yPos)
   }
-  else if( idNum === greenIndex) {
-    balloonColor = color('#00FF00');
+  else if( idNum === dreamsIndex) {
+    image(dreamsImg, xPos, yPos);
   }
-  else if( idNum === yellowIndex) {
-    balloonColor = color('#FFFF00');
+  else if( idNum === viewerIndex) {
+    image(viewerImg, xPos, yPos);
+  }
+  else if( idNum === morningIndex) {
+    image(morningImg, xPos, yPos);
+  }
+  else if( idNum === nightIndex){
+    image(nightImg, xPos, yPos)
   }
 }
 
 // if we pop the balloon, then you can't re-pop or inflate or deflate
 function popBalloon() {
   popSound.play();
-
-  ellipseDiameter = poppedEllipseDiameter;
-
-  // balloon popped, hide these buttons
-  clickables[inflateIndex].visible = false;
-  clickables[deflateIndex].visible = false; 
 }
 
 
