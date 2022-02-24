@@ -28,7 +28,7 @@ const nightIndex = 4;
 const pillowSize = 50;
 
 // locations for pillow + images
-const xPos = 535;
+const xPos = 600;
 const yPos = 70;
 
 // variables for the ballon
@@ -36,11 +36,25 @@ var ellipseDiameter = pillowSize;
 
 // image variables
 var pillowImg;
-var images = [];
+var bedImg;
+var dreamsImg;
+var viewerImg;
+var morningImg;
+var nightImg;
+var gradientImg;
+var borderImg;
+
 var currentImageIndex = 0;
 
-// pop sound
-var popSound;
+// select sound
+var selectSound;
+
+// initialize clickables
+var showBedImg = false;
+var showDreamsImg = false;
+var showViewerImg = false;
+var showMorningImg = false;
+var showNightImg = false;
 
 // ALWAYS allocate the ClickableManager in the preload() function
 // if you get an error here, it is likely the .csv file that is not the
@@ -53,19 +67,23 @@ function preload(){
   bedImg = loadImage('assets/bed.png');
   dreamsImg = loadImage('assets/dreams.png');
   viewerImg = loadImage('assets/viewer.png');
+  morningImg = loadImage('assets/morning.png');
+  nightImg = loadImage('assets/night.png');
+  gradientImg = loadImage('assets/gradientCircle.png');
+  borderImg = loadImage('assets/border.png');
 }
 
 // ALWAYS call the setup() funciton for ClickableManager in the setup(), after
 // the class has been allocated in the preload() function.
 function setup() {
-  createCanvas(1200,800);  
+  createCanvas(1200,700);  
 
   imageMode(CORNER);
   rectMode(CORNER);
 
   // load the pop sound
-  // soundFormats('mp3');
-  // popSound = loadSound('assets/pop.mp3');
+  soundFormats('mp3');
+  selectSound = loadSound('assets/select.mp3');
 
   // setup the clickables = this will allocate the array
   clickables = clickablesManager.setup();
@@ -79,15 +97,16 @@ function setup() {
 
   // output to the message window
   console.log(clickables);
-
-  // center images
-  // imageMode(CENTER);
 }
 
 // Just draw the button
 function draw() {
   background("#516984");
 
+  // draw background circle
+  drawBackgrounds();
+
+  // draw text
   drawText();
 
   // draw the p5.clickables
@@ -95,23 +114,68 @@ function draw() {
 
   // draw pillow
   drawPillow();
+
+  // boolean images
+  if(showBedImg){
+    bedImg.resize(400, 400);
+    image(bedImg, xPos, yPos);
+  }
+  if(showDreamsImg){
+    dreamsImg.resize(400, 400);
+    image(dreamsImg, xPos, yPos);
+  }
+  if(showViewerImg){
+    viewerImg.resize(400, 400); 
+    image(viewerImg, xPos, yPos);
+  }
+  if(showMorningImg){
+    morningImg.resize(400,400);
+    image(morningImg, xPos, yPos);
+  }
+  if(showNightImg){
+    nightImg.resize(400, 400);
+    image(nightImg, xPos, yPos);
+  }
 }
 
 function drawText() {
-  fill('#e8e8e8');
-  textSize(30);
+  textAlign(LEFT);
   textFont('Forma DJR Deck');
-  text('The Dream-Recording Pillow', 80, 200);
+
+  //title
+  textSize(33);
+  fill('#F1C15D');
+  text('The Dream-Recording Pillow', 80, 130);
   
   //description
-  textSize(15);
-  text('The dream-recording pillow will allow everyone to better understand themselves and make the most of the time they spend while asleep.', 80, 250, 400);
-  // text('The average person spends almost one third of their lifetime asleep, yet less sleep leads to a shorter lifespan. In order to find balance between taking care of the body and maximizing time to be productive, the dream-recording pillow will encourage sleep while saving time spent awake on uncovering emotions and desires. Sleeping allows for humans to process the events of the previous day while also creating very vivid imagery. The dream-recording pillow creates opportunities to better understand anxieties and fears, identify subconscious desires, and to dream bigger and better.', 80, 325, 400);
+  fill('#e8e8e8');
+  textSize(17);
+  text('The dream-recording pillow will allow everyone to better understand themselves and make the most of the time they spend while asleep.', 80, 180, 400);
+  text('The average person spends almost one third of their lifetime asleep, yet less sleep leads to a shorter lifespan. In order to find balance between taking care of the body and maximizing time to be productive, the dream recording pillow will encourage sleep while saving time spent awake on uncovering emotions and desires. Sleeping allows for humans to process the events of the previous day while also creating very vivid imagery. The dream-recording pillow creates opportunities to better understand anxieties and fears, identify subconscious desires, and to dream bigger and better.', 80, 255, 400);
+
+  //instructions
+  textAlign(RIGHT);
+  textSize(13);
+  text('Toggle different scenarios ⭢', 550, 560, 100);
+}
+
+function drawBackgrounds(){
+  imageMode(CORNER);
+  // circle behind drawings
+  image(gradientImg, xPos - 50, yPos - 50);
+
+  //rectangle behind buttons
+  fill('#465A72');
+  noStroke();
+  rect(540, 540, 500, 70, 20);
+
+  // star border
+  image(borderImg, 0, 0);
 }
 
 function drawPillow() {
   push();
-  imageMode(CORNER);
+  pillowImg.resize(400, 400);
   image(pillowImg, xPos, yPos);
   pop();
 }
@@ -124,7 +188,7 @@ function setupClickables() {
     clickables[i].onHover = clickableButtonHover;
     clickables[i].onOutside = clickableButtonOnOutside;
 
-    clickables[i].drawImageOnly = false;
+    clickables[i].drawImageOnly = true; // no border, no background
 
   }
 }
@@ -135,6 +199,8 @@ clickableButtonPressed = function () {
 // NEW PILLOW
   if( this.id === bedIndex || this.id === dreamsIndex || this.id === viewerIndex || this.id === morningIndex || this.id === nightIndex) {
     newPillow(this.id);
+    // play sound effect when clicked
+    selectSound.play();
   }
 }
 
@@ -151,36 +217,36 @@ clickableButtonOnOutside = function () {
     this.color = "#F1C15D"; // yellow
   }
   else {
-    this.color = "#00000000"; // blue
+    this.color = "#aabac5"; // blue
   }
 
   this.noTint = true;
 }
 
-//--- BALLOON FUNCTIONS --
+//--- FUNCTIONS --
 
 function newPillow(idNum) {
 
   if( idNum === bedIndex) {
-    image(bedImg, xPos, yPos)
+    showBedImg = !showBedImg;
   }
   else if( idNum === dreamsIndex) {
-    image(dreamsImg, xPos, yPos);
+    showDreamsImg = !showDreamsImg;
   }
   else if( idNum === viewerIndex) {
-    image(viewerImg, xPos, yPos);
+    showViewerImg = !showViewerImg;
   }
   else if( idNum === morningIndex) {
-    image(morningImg, xPos, yPos);
+    showMorningImg = !showMorningImg;
   }
   else if( idNum === nightIndex){
-    image(nightImg, xPos, yPos)
+    showNightImg = !showNightImg;
   }
 }
 
 // if we pop the balloon, then you can't re-pop or inflate or deflate
-function popBalloon() {
-  popSound.play();
-}
+// function select () {
+//   popSound.play();
+// }
 
 

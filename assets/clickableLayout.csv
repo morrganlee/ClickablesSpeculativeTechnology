@@ -1,6 +1,6 @@
 ID,Name,PNGFilename,Text,x,y,visible
-0,Bed,assets/bedButton.png,,600,550,yes
-1,Dreams,assets/dreamsButton.png,,750,550,yes
-2,Viewer,assets/viewerButton.png,,900,550,yes
-3,Morning,assets/morningButton.png,,675,650,yes
-4,Night,assets/nightButton.png,,825,650,yes
+0,Bed,assets/bedButton.png,,670,550,yes
+1,Dreams,assets/dreamsButton.png,,745,550,yes
+2,Viewer,assets/viewerButton.png,,820,550,yes
+3,Morning,assets/morningButton.png,,895,550,yes
+4,Night,assets/nightButton.png,,970,550,yes
